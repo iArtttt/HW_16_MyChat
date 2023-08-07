@@ -31,60 +31,26 @@ namespace MyChatServer
         }
         private void MenuCreate()
         {
-            Menu.DetectMenu<ClientMainMenu>(this).Process();
-            //Menu = new Menu("Main menu", 1, new Action(() => { }));
-            //Menu = new Menu(this, "Main menu", 1);
-            //Menu.AddMenuItem(new MenuItem(this, "Public chat", 1, new Action(async () =>
-            //{
-            //    var task = Task.CompletedTask;
-            //    task = Task.Run(() =>
-            //    {
-            //        string? line = null;
-            //        do
-            //        {
-            //            line = _reader.ReadLine();
-
-                        
-            //            Log(line);
-            //            MessageRecive?.Invoke(_tcpClient.Client.RemoteEndPoint, line);
-                        
-
-
-
-            //        } while (!string.IsNullOrEmpty(line));
-            //    });
-            //    await task;                
-            //})));
-            //Menu.AddMenuItem(new MenuItem(this, "Private chat", 2));
-            //Menu.AddMenuItem(new MenuItem(this, "Rename", 3, new Action(() =>
-            //{ 
-            //    _writer.Flush();
-            //    SendMessage("Please Enter your NickName: ", ConsoleColor.DarkYellow);
-            //    //_writer.Write("Please Enter your NickName: ");
-            //    var nickName = _reader.ReadLine();
-            //    ChangeName(nickName);
-            //})));
-            //Menu.AddMenuItem(new MenuItem(this, "Disconnect", 0, new Action(() => { Dispose(); })));
+            try
+            {
+                Menu = Menu.DetectMenu<ClientMainMenu>(this);
+            }
+            catch { Dispose(); }
         }
         internal void MessageReciveUse(string? line)
         {
             MessageRecive?.Invoke(_tcpClient.Client.RemoteEndPoint, line);
         }
-        internal void ChangeName(string? name)
+        internal void ChangeName()
         {
-            if (name != null)
+            SendMessage("Please Enter your NickName: ", MessageType.InformationMessege, MessegeClientInfo.Information);
+            _writer.Write("Please Enter your NickName: ");
+            var newNickName = _reader.ReadLine();
+            if (newNickName != null)
             {
-                NickName = name;
+                NickName = newNickName;
                 this.NameChanged(NickName);                
             }
-        }
-
-        public void Dispose()
-        {
-            Log($"{NickName} Disconected", ConsoleColor.DarkRed);
-            _reader.Dispose();
-            _writer.Dispose();
-            _stream.Close();
         }
 
         public Task Start()
@@ -123,12 +89,23 @@ namespace MyChatServer
             Console.WriteLine($"[{_tcpClient.Client.RemoteEndPoint}]: {message}");
             Console.ResetColor();
         }
-        public void SendMessage(string message, ConsoleColor consoleColor = ConsoleColor.Gray)
+        public void SendMessage(string message, MessageType messageType ,MessegeClientInfo clientInfo = default)
         {
-            Console.ForegroundColor = consoleColor;
-            _writer.WriteLine(message, consoleColor);
+
+            if(clientInfo == default)
+                _writer.WriteLine($"{(byte)messageType}[{message}");
+            else
+                _writer.WriteLine($"{(byte)messageType}]{(byte)clientInfo}[{message}");
+
             _writer.Flush();
-            Console.ResetColor();
+        }
+
+        public void Dispose()
+        {
+            Log($"{NickName} Disconected", ConsoleColor.DarkRed);
+            _stream.Close();
+            //_reader.Dispose();
+            //_writer.Dispose();
         }
 
         public event Action<EndPoint?, string?> MessageRecive;
@@ -168,7 +145,7 @@ namespace MyChatServer
             Console.ForegroundColor = ConsoleColor.DarkYellow;
             Console.WriteLine($"{oldName ?? client.TcpClient.Client.RemoteEndPoint.ToString()} change NickName to {name}");
             Console.ResetColor();
-            client.SendMessage($"Log+@!_NeW0nAmE:] {name}");
+            client.SendMessage($"You change your NickName to {name}", MessageType.InformationMessege, MessegeClientInfo.Succed);
         }
         private static void Client_MessageRecive(EndPoint? sender, string? obj)
         {
@@ -176,10 +153,10 @@ namespace MyChatServer
             {
                 if (nickNames.TryGetValue(sender, out var nickName))
                 {
-                    clients.ForEach(c => c.SendMessage($"[{nickName}]: {obj}"));
+                    clients.ForEach(c => c.SendMessage($"{nickName}]: {obj}", MessageType.PublicChat));
                 }
                 else 
-                    clients.ForEach(c => c.SendMessage($"[{sender}]: {obj}"));
+                    clients.ForEach(c => c.SendMessage($"{sender}]: {obj}", MessageType.PublicChat));
             }
         }
     }
