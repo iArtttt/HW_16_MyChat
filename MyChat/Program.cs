@@ -52,9 +52,9 @@ namespace MyChat
                                     
                                         break;
                                 
-                                    case (byte)MessageType.Menu:
+                                    case (byte)MessageType.Print:
                                     
-                                        Menu(splited, tcpClient);
+                                        Print(splited);
 
                                         break;
                                 
@@ -66,7 +66,7 @@ namespace MyChat
                                 
                                     case (byte)MessageType.PrivateChat:
 
-                                        PrivateChat(splited, line, tcpClient);
+                                        PrivateChat(splited, tcpClient);
                                         
                                         break;
                                 
@@ -186,17 +186,17 @@ namespace MyChat
                 Console.WriteLine();
         }
 
-        private static void Menu(string[] splited, TcpClient tcpClient)
-        {
+        //private static void Menu(string[] splited, TcpClient tcpClient)
+        //{
 
-            if (splited.Skip(2).FirstOrDefault() != null)
-                Console.WriteLine(splited.Skip(1).Aggregate((f, c) => f + " " + c));
-            else if (splited.Skip(1).FirstOrDefault() != null)
-                Console.WriteLine(splited[1]);
-            else
-                Console.WriteLine();
+        //    if (splited.Skip(2).FirstOrDefault() != null)
+        //        Console.WriteLine(splited.Skip(1).Aggregate((f, c) => f + " " + c));
+        //    else if (splited.Skip(1).FirstOrDefault() != null)
+        //        Console.WriteLine(splited[1]);
+        //    else
+        //        Console.WriteLine();
 
-        }
+        //}
 
         public static void PublicChat(string?[] splited, string line, TcpClient tcpClient)
         {
@@ -209,7 +209,7 @@ namespace MyChat
             else if (splited[1] != tcpClient.Client.LocalEndPoint.ToString() && isInPublicChat)
                     Print(splited);
         }
-        public static void PrivateChat(string?[] splited, string line, TcpClient tcpClient)
+        public static void PrivateChat(string?[] splited, TcpClient tcpClient)
         {
 
             if (int.TryParse(splited[1], out int infoType))

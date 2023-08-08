@@ -70,9 +70,9 @@ namespace MyChatServer
                 for (int i = 0; i < _items.Count; i++)
                 {
                     if (i == _index) 
-                        _client.SendMessage($"{_items[i].Title} <-- {_items[i].Description}", MessageType.Menu);
+                        _client.SendMessage($"{_items[i].Title} <-- {_items[i].Description}", MessageType.Print);
                     else 
-                        _client.SendMessage($"{_items[i].Title}", MessageType.Menu);
+                        _client.SendMessage($"{_items[i].Title}", MessageType.Print);
                 }
 
                 MoveEnter();
