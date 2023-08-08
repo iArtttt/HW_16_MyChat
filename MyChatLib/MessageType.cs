@@ -7,15 +7,16 @@
         Menu,
         PublicChat,
         PrivateChat,
-        ChangeNameSucced,
     }
     public enum MessegeClientInfo : byte
     {
+        Unknown,
         Allert,
         Clear,
         Succed,
         Information,
         MenuTrue,
         MenuFalse,
+        ChangeName,
     }
 }

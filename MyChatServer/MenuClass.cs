@@ -45,6 +45,12 @@ namespace MyChatServer
         public Menu(ChatClient client, string? title, Action? process = null, string? description = null)
             : base(client, title, process, description)
         { }
+        public Menu(ChatClient client, string? title, string? description)
+            : base(client, title, null, description)
+        { }
+        public Menu(ChatClient client, string? title)
+            : base(client, title, null, null)
+        { }
 
         public void AddMenuItem(IMenuItem item)
         {
@@ -59,11 +65,12 @@ namespace MyChatServer
                 _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
                 _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Clear);
                 _client.SendMessage($"{Title ?? "Main menu"}", MessageType.InformationMessege, MessegeClientInfo.Information);
+                _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
 
                 for (int i = 0; i < _items.Count; i++)
                 {
                     if (i == _index) 
-                        _client.SendMessage($"{_items[i].Title} <--", MessageType.Menu);
+                        _client.SendMessage($"{_items[i].Title} <-- {_items[i].Description}", MessageType.Menu);
                     else 
                         _client.SendMessage($"{_items[i].Title}", MessageType.Menu);
                 }
@@ -119,7 +126,7 @@ namespace MyChatServer
                 .Select(m =>
                 {
                     var attribute = m.GetCustomAttribute<MenuActionAttribute>();
-                    return new MenuItem(client, attribute!.Title, () => { m.Invoke(obj, new[] {client} ); });
+                    return new MenuItem(client, attribute!.Title, () => { m.Invoke(obj, new[] {client} ); }, attribute.Description);
                 });
 
             var subMenus = typeMenu.GetProperties()
@@ -127,7 +134,7 @@ namespace MyChatServer
                 .Select(p =>
                 {
                     var attribute = p.GetCustomAttribute<MenuSubmenuAttribute>();
-                    return new { Menu = new Menu(client, attribute!.Title ?? p.Name), Type = p.PropertyType };
+                    return new { Menu = new Menu(client, attribute!.Title ?? p.Name, attribute.Description), Type = p.PropertyType};
                 });
 
             foreach (var menu in subMenus)
