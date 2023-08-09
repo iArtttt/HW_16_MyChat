@@ -63,16 +63,16 @@ namespace MyChatServer
             while (!_isExit && _client.TcpClient.Connected)
             {
                 _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
-                _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Clear);
+                _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.ClearClientConsole);
                 _client.SendMessage($"{Title ?? "Main menu"}", MessageType.InformationMessege, MessegeClientInfo.Information);
                 _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
 
                 for (int i = 0; i < _items.Count; i++)
                 {
                     if (i == _index) 
-                        _client.SendMessage($"{_items[i].Title} <-- {_items[i].Description}", MessageType.Print);
+                        _client.SendMessage($"{_items[i].Title} <-- {_items[i].Description}", MessageType.InformationMessege, MessegeClientInfo.Succed);
                     else 
-                        _client.SendMessage($"{_items[i].Title}", MessageType.Print);
+                        _client.SendMessage($"{_items[i].Title}", MessageType.InformationMessege);
                 }
 
                 MoveEnter();
@@ -81,37 +81,45 @@ namespace MyChatServer
         }
         private void MoveEnter()
         {
-            var key = (ConsoleKey)Convert.ToInt32(_reader.ReadLine());
-
-            switch (key)
+            try
             {
-                case ConsoleKey.W: _index = (_index - 1 < 0) ? _items.Count - 1 : _index - 1;
-                    break;
-                case ConsoleKey.UpArrow:    goto case ConsoleKey.W;
 
-                case ConsoleKey.S: _index = (_index + 1 > _items.Count - 1) ? 0 : _index + 1;
-                    break;
-                case ConsoleKey.DownArrow: goto case ConsoleKey.S;
+                var key = (ConsoleKey)Convert.ToInt32(_reader.ReadLine());
 
-                case ConsoleKey.D:
-                    try
-                    {
-                        _items[_index].Process();
-                    }
-                    catch
-                    {
+                switch (key)
+                {
+                    case ConsoleKey.W: _index = (_index - 1 < 0) ? _items.Count - 1 : _index - 1;
+                        break;
+                    case ConsoleKey.UpArrow:    goto case ConsoleKey.W;
+
+                    case ConsoleKey.S: _index = (_index + 1 > _items.Count - 1) ? 0 : _index + 1;
+                        break;
+                    case ConsoleKey.DownArrow: goto case ConsoleKey.S;
+
+                    case ConsoleKey.D:
+                        try
+                        {
+                            _items[_index].Process();
+                        }
+                        catch
+                        {
+                            _index = 0;
+                        }
+                        break;
+                    case ConsoleKey.RightArrow: goto case ConsoleKey.D;
+                    case ConsoleKey.Enter: goto case ConsoleKey.D;
+
+                    case ConsoleKey.A:
+                        _isExit = true;
                         _index = 0;
-                    }
-                    break;
-                case ConsoleKey.RightArrow: goto case ConsoleKey.D;
-                case ConsoleKey.Enter: goto case ConsoleKey.D;
-
-                case ConsoleKey.A:
-                    _isExit = true;
-                    _index = 0;
-                    break;
-                case ConsoleKey.Backspace: goto case ConsoleKey.A;
-                case ConsoleKey.LeftArrow: goto case ConsoleKey.A;
+                        break;
+                    case ConsoleKey.Backspace: goto case ConsoleKey.A;
+                    case ConsoleKey.LeftArrow: goto case ConsoleKey.A;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
         internal static Menu DetectMenu<T>(ChatClient client) where T : new() => DetectMenu(client, new Menu(client, null), typeof(T));

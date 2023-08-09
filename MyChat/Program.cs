@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Sockets;
@@ -22,8 +23,8 @@ namespace MyChat
             using var tcpClient = new TcpClient(AddressFamily.InterNetwork);
             tcpClient.Connect(IPAddress.Loopback, 5002);
 
-            Console.WriteLine($"Client started on {tcpClient.Client.LocalEndPoint}");
-            Console.WriteLine($"Connected to " + tcpClient.Client.RemoteEndPoint);
+            Console.WriteLine($"Client started on [{tcpClient.Client.LocalEndPoint}]");
+            Console.WriteLine($"Connected to [{tcpClient.Client.RemoteEndPoint}]");
 
 
             var stream = tcpClient.GetStream();
@@ -52,15 +53,15 @@ namespace MyChat
                                     
                                         break;
                                 
-                                    case (byte)MessageType.Print:
+                                    //case (byte)MessageType.Print:
                                     
-                                        Print(splited);
+                                    //    Print(splited);
 
-                                        break;
+                                    //    break;
                                 
                                     case (byte)MessageType.PublicChat:
 
-                                        PublicChat(splited, line, tcpClient);
+                                        PublicChat(splited, tcpClient);
 
                                         break;
                                 
@@ -69,6 +70,7 @@ namespace MyChat
                                         PrivateChat(splited, tcpClient);
                                         
                                         break;
+
                                 
                                 }
                             }
@@ -117,13 +119,11 @@ namespace MyChat
                 {
                     case (byte)MessegeClientInfo.Allert:
 
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Print(splited, 2);
-                        Console.ResetColor();
+                        Print(splited, 2, ConsoleColor.Red);
 
                         break;
 
-                    case (byte)MessegeClientInfo.Clear:
+                    case (byte)MessegeClientInfo.ClearClientConsole:
 
                         Console.Clear();
                         
@@ -131,23 +131,17 @@ namespace MyChat
                     
                     case (byte)MessegeClientInfo.Succed:
 
-                        Console.ForegroundColor = ConsoleColor.Green;
+                        Print(splited, 2, ConsoleColor.Green);
 
-                        Print(splited, 2);
-
-                        Console.ResetColor();
-                        
                         break;
                     
                     case (byte)MessegeClientInfo.Information:
 
-                        Console.ForegroundColor = ConsoleColor.Yellow;
                         
                         if (splited.Skip(2).FirstOrDefault() == "Change Public Chat Access")
                             isInPublicChat = !isInPublicChat;
                         else
-                            Print(splited, 2);
-                        Console.ResetColor();
+                            Print(splited, 2, ConsoleColor.Yellow);
 
                         break;
                     
@@ -156,12 +150,28 @@ namespace MyChat
                         
                         isMenu = true;
                         
+                        if (splited.Skip(2).FirstOrDefault() != null)
+                            Print(splited, 2, ConsoleColor.Yellow);
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Please press ( Enter ) to continue...");
+                        }
+
                         break;
                     
                     case (byte)MessegeClientInfo.MenuFalse:
                         
                         isMenu = false;
-                        
+
+                        if (splited.Skip(2).FirstOrDefault() != null)
+                            Print(splited, 2, ConsoleColor.Yellow);
+                        else
+                        {
+                            Console.WriteLine();
+                            Console.WriteLine("Please press ( Enter ) to continue...");
+                        }
+
                         break;
                     
                     case (byte)MessegeClientInfo.ChangeName:
@@ -171,34 +181,36 @@ namespace MyChat
                             : splited[2];
 
                         break;
+                    default:
+
+                        Print(splited, 0);
+                        
+                        break;
                 }
-
-
+            }
+            else
+            {
+                Print(splited);
             }
         }
-        private static void Print(string?[] splited, int skipelements = 1)
+
+        private static void Print(string?[] splited, ConsoleColor consoleColor) => Print(splited, 1, consoleColor);
+        private static void Print(string?[] splited, int skipelements = 1) => Print(splited, skipelements, ConsoleColor.Gray);
+        private static void Print(string?[] splited, int skipelements, ConsoleColor consoleColor)
         {
+            Console.ForegroundColor = consoleColor;
+            
             if (splited.Skip(skipelements + 1).FirstOrDefault() != null)
                 Console.WriteLine(splited.Skip(skipelements).Aggregate((f, c) => f + " " + c));
             else if (splited.Skip(skipelements).FirstOrDefault() != null)
                 Console.WriteLine(splited[skipelements]);
             else 
                 Console.WriteLine();
+            
+            Console.ResetColor();
         }
 
-        //private static void Menu(string[] splited, TcpClient tcpClient)
-        //{
-
-        //    if (splited.Skip(2).FirstOrDefault() != null)
-        //        Console.WriteLine(splited.Skip(1).Aggregate((f, c) => f + " " + c));
-        //    else if (splited.Skip(1).FirstOrDefault() != null)
-        //        Console.WriteLine(splited[1]);
-        //    else
-        //        Console.WriteLine();
-
-        //}
-
-        public static void PublicChat(string?[] splited, string line, TcpClient tcpClient)
+        public static void PublicChat(string?[] splited, TcpClient tcpClient)
         {
 
             if (Name != string.Empty)
@@ -218,13 +230,11 @@ namespace MyChat
                 {
                     case (byte)MessegeClientInfo.Allert:
 
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Print(splited, 2);
-                        Console.ResetColor();
+                        Print(splited, 2, ConsoleColor.DarkRed);
 
                         break;
 
-                    case (byte)MessegeClientInfo.Clear:
+                    case (byte)MessegeClientInfo.ClearClientConsole:
 
                         Console.Clear();
 
@@ -232,34 +242,27 @@ namespace MyChat
 
                     case (byte)MessegeClientInfo.Succed:
 
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        
-                        Print(splited, 2);
-
-                        Console.ResetColor();
+                        Print(splited, 2, ConsoleColor.DarkGreen);
 
                         break;
 
                     case (byte)MessegeClientInfo.Information:
 
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-
-                        Print(splited, 2);
+                        Print(splited, 2, ConsoleColor.DarkYellow);
                         
-                        Console.ResetColor();
+                        break;
+
+                    default:
+
+                        Print(splited, ConsoleColor.Blue);
 
                         break;
                 }
-
-
             }
-            if (Name != string.Empty)
+            else 
             {
-                if (splited[1].ToString().CompareTo(Name) < 0)
-                    Print(splited, 2);
+                Print(splited, ConsoleColor.DarkBlue);
             }
-            else if (splited[1] != tcpClient.Client.LocalEndPoint.ToString())
-                    Print(splited, 2);
         }
     }
 }

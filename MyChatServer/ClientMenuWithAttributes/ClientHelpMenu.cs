@@ -9,7 +9,7 @@ namespace MyChatServer
         {
             var reader = new StreamReader(client.TcpClient.GetStream());
 
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Clear);
+            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.ClearClientConsole);
             client.SendMessage("====( How to move Tutorial )====", MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("To move ( UP )      ==> Press 'W' or 'UpArrow'", MessageType.InformationMessege, MessegeClientInfo.Information);
@@ -33,7 +33,7 @@ namespace MyChatServer
         {
             var reader = new StreamReader(client.TcpClient.GetStream());
 
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Clear);
+            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.ClearClientConsole);
             client.SendMessage("====( Spesial )====", MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("There is nothing heare yet", MessageType.InformationMessege, MessegeClientInfo.Information);

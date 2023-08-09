@@ -7,7 +7,6 @@
         /// For ( MessageType.InformationMessege ) you need use ( MessegeClientInfo enum )
         /// </summary>
         InformationMessege,
-        Print,
         PublicChat,
         PrivateChat,
     }
@@ -18,11 +17,11 @@
     {
         Unknown,
         Allert,
-        Clear,
-        Succed,
         Information,
+        Succed,
         MenuTrue,
         MenuFalse,
+        ClearClientConsole,
         ChangeName,
     }
 }
