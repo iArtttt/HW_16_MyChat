@@ -97,26 +97,38 @@ namespace MyChatServer
 
         private int _people = 0;
         public string RoomName { get; }
-        public bool IsAvailable { get; } = true;
-        //private StreamReader reader;
+        public bool IsAvailable { get; private set; } = true;
         internal void Connect(ChatClient client)
         {
             try
             {
-                if (_people >= 2) client.SendMessage($"Room ( {RoomName} ) is full", MessageType.PrivateChat, MessegeClientInfo.Allert);
+                var reader = new StreamReader(client.TcpClient.GetStream());
+                if (!IsAvailable)
+                {
+                    client.SendMessage($"Room ( {RoomName} ) is full", MessageType.PrivateChat, MessegeClientInfo.Allert);
+                    reader.ReadLine();
+                }
                 else
                 {
                     _people++;
-                    var reader = new StreamReader(client.TcpClient.GetStream());
+
+                    if (_people == 2) { IsAvailable = false; }
+
+                    
                     client.PrivateRoomName = RoomName;
                     var line = string.Empty;
-                    
+
+                    client.SendMessage(null, MessageType.ClearClientConsole);
                     client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuFalse);
                     reader.ReadLine();
 
+                    client.SendMessage(null, MessageType.ClearClientConsole);
+                    client.SendMessage($"You connect to private chat room {RoomName}", MessageType.PrivateChat);
+                    client.SendMessage(null, MessageType.PrivateChat);
+
 
                     client.Log($"Connect to private room {RoomName}", ConsoleColor.DarkBlue);
-                    client.MessagePrivateReciveUse($"Connect to private room {RoomName}");
+                    client.MessagePrivateReciveUse($"Connect to private room");
                     do
                     {
                         line = reader.ReadLine();
@@ -134,7 +146,10 @@ namespace MyChatServer
                     client.MessagePrivateReciveUse("Left Room");
                     client.PrivateRoomName = string.Empty;
 
+                    client.SendMessage($"You left private chat room {RoomName}", MessageType.PrivateChat);
+                    client.SendMessage(null, MessageType.PrivateChat);
                     client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
+                    
                     reader.ReadLine();
                 }
             
@@ -143,6 +158,10 @@ namespace MyChatServer
             {
                 Console.WriteLine(ex.Message);
             }
+            finally
+            {
+                if (_people < 2) { IsAvailable = true; }
+            }
         }
     }
 
@@ -150,9 +169,9 @@ namespace MyChatServer
     {
         internal static List<PrivateRoom> PrivateRoomsList = new List<PrivateRoom>();
 
-        private static List<ChatClient> _clients = new List<ChatClient>();
+        private static List<ChatClient> _clientsList = new List<ChatClient>();
         private static Dictionary<EndPoint, string?> nickNames = new Dictionary<EndPoint, string?>();
-        internal static List<ChatClient> Clients { get {  return _clients; } }
+        internal static List<ChatClient> Clients { get {  return _clientsList; } }
         private static async Task Main(string[] args)
         {
             var listener = new TcpListener(IPAddress.Any, 5002);
@@ -166,7 +185,7 @@ namespace MyChatServer
                     var client = new ChatClient(await listener.AcceptTcpClientAsync());
                     client.MessageRecive += Client_MessageReceive;
                     client.MessagePrivateRecive += Client_MessagePrivateReceive;
-                    _clients.Add(client);
+                    _clientsList.Add(client);
                     client.Start();
                 }
             }
@@ -190,17 +209,26 @@ namespace MyChatServer
 
                 do
                 {
-                    client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.ClearClientConsole);
+                    client.SendMessage(null, MessageType.ClearClientConsole);
 
                     client.SendMessage($"Please Enter the new Private Room Name", MessageType.PrivateChat, MessegeClientInfo.Information);
                     roomName = reader.ReadLine();
 
                     if (roomName != string.Empty && !PrivateRoomsList.Any(rn => rn.RoomName == roomName))
                     {
-                        PrivateRoomsList.Add(new PrivateRoom(roomName!));
-                        client.SendMessage($"Room ( {roomName} ) was created", MessageType.PrivateChat, MessegeClientInfo.Succed);
-                        client.Log($"Create PrivaeChatRoom: ( {roomName} )", ConsoleColor.Blue);
-                        isFinish = true;
+                        
+
+                        client.SendMessage($"Whould you like to create room ( {roomName} )?", MessageType.PrivateChat, MessegeClientInfo.Information);
+                        client.SendMessage($"Please write ( + ), ( Yes ) or ( Enter ) to try", MessageType.PrivateChat, MessegeClientInfo.Information);
+                        var answer = reader.ReadLine();
+
+                        if (answer == string.Empty || answer == "+" || answer.ToLower() == "yes")
+                        {
+                            isFinish = true;
+                            PrivateRoomsList.Add(new PrivateRoom(roomName!));
+                            client.SendMessage($"Room ( {roomName} ) was created", MessageType.PrivateChat, MessegeClientInfo.Succed);
+                            client.Log($"Create PrivaeChatRoom: ( {roomName} )", ConsoleColor.Blue);
+                        }
                     }
                     else
                     {
@@ -247,17 +275,19 @@ namespace MyChatServer
             {
                 if (nickNames.TryGetValue(sender, out var nickName))
                 {
-                    _clients.ForEach(c => c.SendMessage($"{nickName}]: {text}", MessageType.PublicChat));
+                    _clientsList.ForEach(c => c.SendMessage($"{nickName}]: {text}", MessageType.PublicChat));
                 }
                 else 
-                    _clients.ForEach(c => c.SendMessage($"{sender}]: {text}", MessageType.PublicChat));
+                    _clientsList.ForEach(c => c.SendMessage($"{sender}]: {text}", MessageType.PublicChat));
             }
         }
         private static void Client_MessagePrivateReceive(ChatClient? client, string? text)
         {
             if (text != null)
             {
-                var resiver = _clients.FirstOrDefault(c => c.PrivateRoomName == client.PrivateRoomName, null);
+                var resiver = _clientsList.FirstOrDefault(c => c.PrivateRoomName == client.PrivateRoomName && 
+                                c.TcpClient.Client.RemoteEndPoint != client.TcpClient.Client.RemoteEndPoint, 
+                                null);
 
                 if (resiver != null)
                 {
@@ -266,13 +296,6 @@ namespace MyChatServer
                     else
                         resiver.SendMessage($"{client}]: {text}", MessageType.PrivateChat);
                 }
-
-                //if (nickNames.TryGetValue(client.TcpClient.Client.RemoteEndPoint!, out var nickName))
-                //    _clients.First(c => c.PrivateRoomName == client.PrivateRoomName)
-                //        .SendMessage($"{nickName}]: {text}", MessageType.PrivateChat);                
-                //else
-                //    _clients.First(c => c.PrivateRoomName == client.PrivateRoomName)
-                //        .SendMessage($"{client}]: {text}", MessageType.PrivateChat);
             }
         }
     }

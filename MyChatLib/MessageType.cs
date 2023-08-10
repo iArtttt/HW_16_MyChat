@@ -9,6 +9,7 @@
         InformationMessege,
         PublicChat,
         PrivateChat,
+        ClearClientConsole,
     }
     /// <summary>
     /// MessegeClientInfo enum is using with MessageType.InformationMessege enum
@@ -21,7 +22,8 @@
         Succed,
         MenuTrue,
         MenuFalse,
-        ClearClientConsole,
+        PublicChatTrue,
+        PublicChatFalse,
         ChangeName,
     }
 }

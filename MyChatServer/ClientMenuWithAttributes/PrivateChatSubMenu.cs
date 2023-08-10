@@ -7,7 +7,7 @@ namespace MyChatServer
         [MenuAction("PrivateChat", 1, "Connect to private chat room")]
         public void PrivateChatSelect(ChatClient client)
         {
-            client.SendMessage(null, MessageType.PrivateChat, MessegeClientInfo.ClearClientConsole);
+            client.SendMessage(null, MessageType.ClearClientConsole);
             var reader = new StreamReader(client.TcpClient.GetStream());
 
             if (Program.PrivateRoomsList.Count > 0)
@@ -21,7 +21,7 @@ namespace MyChatServer
                     while (!_isExit && client.TcpClient.Connected)
                     {
 
-                        client.SendMessage(null, MessageType.PrivateChat, MessegeClientInfo.ClearClientConsole);
+                        client.SendMessage(null, MessageType.ClearClientConsole);
                         client.SendMessage("Choose wich Room you want to chat:", MessageType.PrivateChat, MessegeClientInfo.Information);
                         client.SendMessage(null, MessageType.PrivateChat, MessegeClientInfo.Information);
 

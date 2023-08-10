@@ -53,12 +53,6 @@ namespace MyChat
                                     
                                         break;
                                 
-                                    //case (byte)MessageType.Print:
-                                    
-                                    //    Print(splited);
-
-                                    //    break;
-                                
                                     case (byte)MessageType.PublicChat:
 
                                         PublicChat(splited, tcpClient);
@@ -71,7 +65,12 @@ namespace MyChat
                                         
                                         break;
 
-                                
+                                    case (byte)MessageType.ClearClientConsole:
+
+                                        Console.Clear();
+
+                                        break;
+
                                 }
                             }
                         }
@@ -122,12 +121,6 @@ namespace MyChat
                         Print(splited, 2, ConsoleColor.Red);
 
                         break;
-
-                    case (byte)MessegeClientInfo.ClearClientConsole:
-
-                        Console.Clear();
-                        
-                        break;
                     
                     case (byte)MessegeClientInfo.Succed:
 
@@ -137,11 +130,7 @@ namespace MyChat
                     
                     case (byte)MessegeClientInfo.Information:
 
-                        
-                        if (splited.Skip(2).FirstOrDefault() == "Change Public Chat Access")
-                            isInPublicChat = !isInPublicChat;
-                        else
-                            Print(splited, 2, ConsoleColor.Yellow);
+                        Print(splited, 2, ConsoleColor.Yellow);
 
                         break;
                     
@@ -169,8 +158,25 @@ namespace MyChat
                         else
                         {
                             Console.WriteLine();
-                            Console.WriteLine("Please press ( Enter ) to continue...");
+                            Console.WriteLine("Please press ( Any Button ) to continue...");
                         }
+
+                        break;
+                    case (byte)MessegeClientInfo.PublicChatTrue:
+
+                        isInPublicChat = true;
+
+                        if (splited.Skip(2).FirstOrDefault() != null)
+                            Print(splited, 2, ConsoleColor.Yellow);
+
+                        break;
+                    
+                    case (byte)MessegeClientInfo.PublicChatFalse:
+
+                        isInPublicChat = false;
+
+                        if (splited.Skip(2).FirstOrDefault() != null)
+                            Print(splited, 2, ConsoleColor.Yellow);
 
                         break;
                     
@@ -193,23 +199,6 @@ namespace MyChat
                 Print(splited);
             }
         }
-
-        private static void Print(string?[] splited, ConsoleColor consoleColor) => Print(splited, 1, consoleColor);
-        private static void Print(string?[] splited, int skipelements = 1) => Print(splited, skipelements, ConsoleColor.Gray);
-        private static void Print(string?[] splited, int skipelements, ConsoleColor consoleColor)
-        {
-            Console.ForegroundColor = consoleColor;
-            
-            if (splited.Skip(skipelements + 1).FirstOrDefault() != null)
-                Console.WriteLine(splited.Skip(skipelements).Aggregate((f, c) => f + " " + c));
-            else if (splited.Skip(skipelements).FirstOrDefault() != null)
-                Console.WriteLine(splited[skipelements]);
-            else 
-                Console.WriteLine();
-            
-            Console.ResetColor();
-        }
-
         public static void PublicChat(string?[] splited, TcpClient tcpClient)
         {
 
@@ -234,11 +223,6 @@ namespace MyChat
 
                         break;
 
-                    case (byte)MessegeClientInfo.ClearClientConsole:
-
-                        Console.Clear();
-
-                        break;
 
                     case (byte)MessegeClientInfo.Succed:
 
@@ -264,6 +248,23 @@ namespace MyChat
                 Print(splited, ConsoleColor.DarkBlue);
             }
         }
+
+        private static void Print(string?[] splited, ConsoleColor consoleColor) => Print(splited, 1, consoleColor);
+        private static void Print(string?[] splited, int skipelements = 1) => Print(splited, skipelements, ConsoleColor.Gray);
+        private static void Print(string?[] splited, int skipelements, ConsoleColor consoleColor)
+        {
+            Console.ForegroundColor = consoleColor;
+            
+            if (splited.Skip(skipelements + 1).FirstOrDefault() != null)
+                Console.WriteLine(splited.Skip(skipelements).Aggregate((f, c) => f + " " + c));
+            else if (splited.Skip(skipelements).FirstOrDefault() != null)
+                Console.WriteLine(splited[skipelements]);
+            else 
+                Console.WriteLine();
+            
+            Console.ResetColor();
+        }
+
     }
 }
 //foreach (var item in splited)

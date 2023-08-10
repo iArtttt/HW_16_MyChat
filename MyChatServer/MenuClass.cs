@@ -63,7 +63,7 @@ namespace MyChatServer
             while (!_isExit && _client.TcpClient.Connected)
             {
                 _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
-                _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.ClearClientConsole);
+                _client.SendMessage(null, MessageType.ClearClientConsole);
                 _client.SendMessage($"{Title ?? "Main menu"}", MessageType.InformationMessege, MessegeClientInfo.Information);
                 _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
 

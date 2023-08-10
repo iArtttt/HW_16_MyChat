@@ -5,11 +5,11 @@ namespace MyChatServer
     internal class ClientHelpMenu
     {
         [MenuAction("How to move", 1, "Press ( Enter ) to open")]
-        public void PropOne(ChatClient client)
+        public void HowToMove(ChatClient client)
         {
             var reader = new StreamReader(client.TcpClient.GetStream());
 
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.ClearClientConsole);
+            client.SendMessage(null, MessageType.ClearClientConsole);
             client.SendMessage("====( How to move Tutorial )====", MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("To move ( UP )      ==> Press 'W' or 'UpArrow'", MessageType.InformationMessege, MessegeClientInfo.Information);
@@ -29,11 +29,11 @@ namespace MyChatServer
             reader.ReadLine();
         }
         [MenuAction("Spesial", 2)]
-        public void PropTwo(ChatClient client)
+        public void Spesial(ChatClient client)
         {
             var reader = new StreamReader(client.TcpClient.GetStream());
 
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.ClearClientConsole);
+            client.SendMessage(null, MessageType.ClearClientConsole);
             client.SendMessage("====( Spesial )====", MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("There is nothing heare yet", MessageType.InformationMessege, MessegeClientInfo.Information);
