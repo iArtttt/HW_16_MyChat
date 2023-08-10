@@ -23,7 +23,7 @@ namespace MyChatServer
         public ChatClient(TcpClient tcpClient)
         {
             _tcpClient = tcpClient;
-            Log("connected");
+            Log("connected", MessageType.InformationMessege);
 
             _stream = _tcpClient.GetStream();
             _reader = new StreamReader(_stream);
@@ -52,8 +52,8 @@ namespace MyChatServer
         }
 
         public Task Start() => _process = Task.Run(Menu.Process);
-        
-        internal void Log(string? message, ConsoleColor consoleColor = ConsoleColor.Gray)
+
+        internal void Log(string? message, MessageType messageType, ConsoleColor consoleColor = ConsoleColor.Gray)
         {
             Console.ForegroundColor = consoleColor;
             if (NickName == string.Empty)
@@ -75,7 +75,7 @@ namespace MyChatServer
 
         public void Dispose()
         {
-            Log($"{NickName} Disconected", ConsoleColor.DarkRed);
+            Log($"{NickName} Disconected", MessageType.InformationMessege, ConsoleColor.DarkRed);
             _reader.Dispose();
             _writer.Dispose();
             _stream.Close();

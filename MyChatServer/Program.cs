@@ -15,6 +15,8 @@ namespace MyChatServer
         private static List<ChatClient> _clientsList = new List<ChatClient>();
         private static Dictionary<EndPoint, string?> nickNames = new Dictionary<EndPoint, string?>();
         internal static List<ChatClient> Clients { get {  return _clientsList; } }
+        internal static List<string> PublicChatMesseges = new List<string>();
+
 
         private static async Task Main(string[] args)
         {
@@ -72,7 +74,7 @@ namespace MyChatServer
                             isFinish = true;
                             PrivateRoomsList.Add(new PrivateRoom(roomName!));
                             client.SendMessage($"Room ( {roomName} ) was created", MessageType.PrivateChat, MessegeClientInfo.Succed);
-                            client.Log($"Create PrivaeChatRoom: ( {roomName} )", ConsoleColor.Blue);
+                            client.Log($"Create PrivaeChatRoom: ( {roomName} )", MessageType.InformationMessege, ConsoleColor.Blue);
                         }
                     }
                     else
@@ -120,10 +122,14 @@ namespace MyChatServer
             {
                 if (nickNames.TryGetValue(sender, out var nickName))
                 {
+                    PublicChatMesseges.Add($"{nickName} {DateTime.Now.Hour}:{DateTime.Now.Minute}: {text}");
                     _clientsList.ForEach(c => c.SendMessage($"{nickName}]: {text}", MessageType.PublicChat));
                 }
-                else 
+                else
+                {
+                    PublicChatMesseges.Add($"{sender} {DateTime.Now.Hour}:{DateTime.Now.Minute}: {text}");
                     _clientsList.ForEach(c => c.SendMessage($"{sender}]: {text}", MessageType.PublicChat));
+                }
             }
         }
         private static void Client_MessagePrivateReceive(ChatClient? client, string? text)

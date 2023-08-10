@@ -189,7 +189,7 @@ namespace MyChat
                         break;
                     default:
 
-                        Print(splited, 0);
+                        Print(splited, 2, ConsoleColor.White);
                         
                         break;
                 }
@@ -204,7 +204,7 @@ namespace MyChat
 
             if (Name != string.Empty)
             {
-                if (splited[1].ToString().CompareTo(Name) < 0 && isInPublicChat)
+                if (splited[1].ToString() != $"{Name}" && isInPublicChat)
                     Print(splited);
             }
             else if (splited[1] != tcpClient.Client.LocalEndPoint.ToString() && isInPublicChat)

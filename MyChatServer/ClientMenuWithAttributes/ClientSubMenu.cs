@@ -13,32 +13,34 @@ namespace MyChatServer
             {
 
                 client.SendMessage(null, MessageType.ClearClientConsole);
+                
+                client.SendMessage("Wait a few seconds connecting...", MessageType.InformationMessege, MessegeClientInfo.PublicChatTrue);
                 client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuFalse);
 
                 reader.ReadLine();
-
-                client.SendMessage(null, MessageType.ClearClientConsole);
-                client.SendMessage("Wait a few second connecting...", MessageType.InformationMessege, MessegeClientInfo.PublicChatTrue);
-
-                client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
-                Thread.Sleep(200);
             
+                client.SendMessage(null, MessageType.ClearClientConsole);
                 client.SendMessage("If you want to leave public chat press ( Enter )", MessageType.InformationMessege, MessegeClientInfo.Information);
                 client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
                 client.SendMessage("You are in public chat now", MessageType.InformationMessege, MessegeClientInfo.Succed);
                 client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
-            
-                client.Log($"Conected to Public Chat", ConsoleColor.DarkGreen);
+                
+                foreach (var item in Program.PublicChatMesseges)
+                {
+                    client.SendMessage($"{item}", MessageType.InformationMessege);
+                }
+
+                client.Log($"Conected to Public Chat", MessageType.InformationMessege, ConsoleColor.DarkGreen);
                 client.MessageReciveUse("( Conected to Public Chat )");
 
-                string? line = null;
+                string? line;
                 do
                 {
                     line = reader.ReadLine();
 
                     if (!string.IsNullOrEmpty(line))
                     {
-                        client.Log(line);
+                        client.Log(line, MessageType.PublicChat);
                         client.MessageReciveUse(line);
                     }
 
@@ -50,7 +52,7 @@ namespace MyChatServer
                 client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.PublicChatFalse);
                 client.SendMessage("Press ( Enter ) disconnecting...", MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
 
-                client.Log($"Disconected from Public Chat", ConsoleColor.DarkRed);
+                client.Log($"Disconected from Public Chat", MessageType.InformationMessege, ConsoleColor.DarkRed);
                 client.MessageReciveUse("( Disconected from Public Chat )");
 
                 reader.ReadLine();

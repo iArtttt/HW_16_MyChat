@@ -63,18 +63,18 @@ namespace MyChatServer
             else if (tutorWached == 1)
             {
                 isTutorOneComplete = true;
-                client.Log("Watch ( How to move ) tutorial", ConsoleColor.DarkGray);
+                client.Log("Watch ( How to move ) tutorial", MessageType.InformationMessege, ConsoleColor.DarkGray);
             }
             else if (tutorWached == 2)
             {
                 isTutorTwoComplete = true;
-                client.Log("Watch ( Spesial ) tutorial", ConsoleColor.DarkGray);
+                client.Log("Watch ( Spesial ) tutorial", MessageType.InformationMessege, ConsoleColor.DarkGray);
             }
             if (isTutorOneComplete && isTutorTwoComplete && !isAllTutorsComplete)
             {
                 isAllTutorsComplete = true;
                 
-                client.Log("( Complete All Tutorial Watching )", ConsoleColor.DarkGray);
+                client.Log("( Complete All Tutorial Watching )", MessageType.InformationMessege, ConsoleColor.DarkGray);
 
                 client.SendMessage("====( ------------------------------------ )====", MessageType.InformationMessege, MessegeClientInfo.Information);
                 client.SendMessage("====( You have already watch all Tutorials )====", MessageType.InformationMessege, MessegeClientInfo.Information);

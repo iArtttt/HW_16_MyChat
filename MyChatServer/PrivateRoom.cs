@@ -42,7 +42,7 @@ namespace MyChatServer
                     client.SendMessage(null, MessageType.PrivateChat);
 
 
-                    client.Log($"Connect to private room {RoomName}", ConsoleColor.DarkBlue);
+                    client.Log($"Connect to private room {RoomName}", MessageType.InformationMessege, ConsoleColor.DarkBlue);
                     client.MessagePrivateReciveUse($"Connect to private room");
                     do
                     {
@@ -50,14 +50,14 @@ namespace MyChatServer
 
                         if (!string.IsNullOrEmpty(line))
                         {
-                            client.Log(line, ConsoleColor.DarkBlue);
+                            client.Log(line, MessageType.PrivateChat, ConsoleColor.DarkBlue);
                             client.MessagePrivateReciveUse(line);
                         }
 
                     } while (!string.IsNullOrEmpty(line));
 
                     _people--;
-                    client.Log($"Left {RoomName}", ConsoleColor.DarkBlue);
+                    client.Log($"Left {RoomName}", MessageType.InformationMessege, ConsoleColor.DarkBlue);
                     client.MessagePrivateReciveUse("Left Room");
                     client.PrivateRoomName = string.Empty;
 
