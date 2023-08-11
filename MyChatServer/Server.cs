@@ -52,7 +52,7 @@ namespace MyChatServer
 
             try
             {
-                client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuFalse);
+                client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.MenuFalse);
                 reader.ReadLine();
 
                 var roomName = string.Empty;
@@ -60,7 +60,7 @@ namespace MyChatServer
 
                 do
                 {
-                    client.SendMessage(null, MessageType.ClearClientConsole);
+                    client.SendMessage(MessageType.ClearClientConsole);
 
                     client.SendMessage($"Please Enter the new Private Room Name", MessageType.PrivateChat, MessegeClientInfo.Information);
                     roomName = reader.ReadLine();
