@@ -9,22 +9,22 @@ namespace MyChatServer
         {
             var reader = new StreamReader(client.TcpClient.GetStream());
 
-            client.SendMessage(null, MessageType.ClearClientConsole);
+            client.SendMessage(MessageType.ClearClientConsole);
             client.SendMessage("====( How to move Tutorial )====", MessageType.InformationMessege, MessegeClientInfo.Information);
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("To move ( UP )      ==> Press 'W' or 'UpArrow'", MessageType.InformationMessege, MessegeClientInfo.Information);
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("To move ( Down )    ==> Press 'S' or 'DownArrow'", MessageType.InformationMessege, MessegeClientInfo.Information);
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("To move ( Forward ) ==> Press 'D' or 'RightArrow' or 'Enter'", MessageType.InformationMessege, MessegeClientInfo.Information);
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("To move ( Back )    ==> Press 'A' or 'LeftArrow' or 'Backspace'", MessageType.InformationMessege, MessegeClientInfo.Information);
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
             
 
             PropThree(client, 1);
 
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("Press any button to leave", MessageType.InformationMessege, MessegeClientInfo.Information);
             reader.ReadLine();
         }
@@ -33,16 +33,16 @@ namespace MyChatServer
         {
             var reader = new StreamReader(client.TcpClient.GetStream());
 
-            client.SendMessage(null, MessageType.ClearClientConsole);
+            client.SendMessage(MessageType.ClearClientConsole);
             client.SendMessage("====( Spesial )====", MessageType.InformationMessege, MessegeClientInfo.Information);
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("There is nothing heare yet", MessageType.InformationMessege, MessegeClientInfo.Information);
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
             
             PropThree(client, 2);
 
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
-            client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
+            client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
             client.SendMessage("Press any button to leave", MessageType.InformationMessege, MessegeClientInfo.Information);
             reader.ReadLine();
         }

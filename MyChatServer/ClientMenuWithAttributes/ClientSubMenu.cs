@@ -12,20 +12,20 @@ namespace MyChatServer
             try
             {
 
-                client.SendMessage(null, MessageType.ClearClientConsole);
+                client.SendMessage(MessageType.ClearClientConsole);
                 
                 client.SendMessage("Wait a few seconds connecting...", MessageType.InformationMessege, MessegeClientInfo.PublicChatTrue);
-                client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuFalse);
+                client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.MenuFalse);
 
                 reader.ReadLine();
             
-                client.SendMessage(null, MessageType.ClearClientConsole);
+                client.SendMessage(MessageType.ClearClientConsole);
                 client.SendMessage("If you want to leave public chat press ( Enter )", MessageType.InformationMessege, MessegeClientInfo.Information);
-                client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+                client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
                 client.SendMessage("You are in public chat now", MessageType.InformationMessege, MessegeClientInfo.Succed);
-                client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+                client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
                 
-                foreach (var item in Program.PublicChatMesseges)
+                foreach (var item in Server.PublicChatMesseges)
                 {
                     client.SendMessage($"{item}", MessageType.InformationMessege);
                 }
@@ -49,7 +49,7 @@ namespace MyChatServer
             }
             finally 
             {
-                client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.PublicChatFalse);
+                client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.PublicChatFalse);
                 client.SendMessage("Press ( Enter ) disconnecting...", MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
 
                 client.Log($"Disconected from Public Chat", MessageType.InformationMessege, ConsoleColor.DarkRed);
@@ -68,7 +68,7 @@ namespace MyChatServer
         [MenuAction("ChangeName", 3, "Here you can change your NikName, other people will see it")]
         public void ChangeName(ChatClient client)
         {
-            client.SendMessage(null, MessageType.ClearClientConsole);
+            client.SendMessage(MessageType.ClearClientConsole);
             client.SendMessage("Press any button to continue", MessageType.InformationMessege, MessegeClientInfo.MenuFalse);
             
             var test = Task.CompletedTask;
@@ -78,7 +78,7 @@ namespace MyChatServer
                 string? newNickName;
                 var reader = new StreamReader(client.TcpClient.GetStream());
                 reader.ReadLine();
-                client.SendMessage(null, MessageType.ClearClientConsole);
+                client.SendMessage(MessageType.ClearClientConsole);
 
                 do
                 {
@@ -98,7 +98,7 @@ namespace MyChatServer
             
                 if (isChanged) client.ChangeNameTo(newNickName);
 
-                client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
+                client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
                 reader.ReadLine();
             });
             test.Wait();

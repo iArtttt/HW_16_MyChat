@@ -33,13 +33,13 @@ namespace MyChatServer
                     client.PrivateRoomName = RoomName;
                     var line = string.Empty;
 
-                    client.SendMessage(null, MessageType.ClearClientConsole);
-                    client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuFalse);
+                    client.SendMessage(MessageType.ClearClientConsole);
+                    client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.MenuFalse);
                     reader.ReadLine();
 
-                    client.SendMessage(null, MessageType.ClearClientConsole);
+                    client.SendMessage(MessageType.ClearClientConsole);
                     client.SendMessage($"You connect to private chat room {RoomName}", MessageType.PrivateChat);
-                    client.SendMessage(null, MessageType.PrivateChat);
+                    client.SendMessage(MessageType.PrivateChat);
 
 
                     client.Log($"Connect to private room {RoomName}", MessageType.InformationMessege, ConsoleColor.DarkBlue);
@@ -62,8 +62,8 @@ namespace MyChatServer
                     client.PrivateRoomName = string.Empty;
 
                     client.SendMessage($"You left private chat room {RoomName}", MessageType.PrivateChat);
-                    client.SendMessage(null, MessageType.PrivateChat);
-                    client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
+                    client.SendMessage(MessageType.PrivateChat);
+                    client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
                     
                     reader.ReadLine();
                 }

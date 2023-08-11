@@ -47,11 +47,11 @@ namespace MyChatServer
             if (newNickName != null)
             {
                 NickName = newNickName;
-                this.NameChanged(NickName);                
+                Server.NameChanged(this ,NickName);                
             }
         }
 
-        public Task Start() => _process = Task.Run(Menu.Process);
+        public Task Start() => _process = Task.Run(() => { Menu.Process(); Dispose(); });
 
         internal void Log(string? message, MessageType messageType, ConsoleColor consoleColor = ConsoleColor.Gray)
         {
@@ -62,6 +62,8 @@ namespace MyChatServer
                 Console.WriteLine($"[{NickName}]: {message}");
             Console.ResetColor();
         }
+        public void SendMessage(MessageType messageType) => SendMessage(null, messageType);
+        public void SendMessage(MessageType messageType, MessegeClientInfo clientInfo) => SendMessage(null, messageType, clientInfo);
         public void SendMessage(string message, MessageType messageType ,MessegeClientInfo clientInfo = default)
         {
 
@@ -75,10 +77,14 @@ namespace MyChatServer
 
         public void Dispose()
         {
-            Log($"{NickName} Disconected", MessageType.InformationMessege, ConsoleColor.DarkRed);
-            _reader.Dispose();
-            _writer.Dispose();
-            _stream.Close();
+            if (_stream.Socket.Connected)
+            {
+                Log($"{NickName} Disconected", MessageType.InformationMessege, ConsoleColor.DarkRed);
+                _stream.Close();
+                _reader.Dispose();
+                _writer.Dispose();
+            }
+        
         }
 
         public event Action<EndPoint?, string?> MessageRecive;

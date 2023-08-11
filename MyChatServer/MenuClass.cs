@@ -62,10 +62,10 @@ namespace MyChatServer
 
             while (!_isExit && _client.TcpClient.Connected)
             {
-                _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
-                _client.SendMessage(null, MessageType.ClearClientConsole);
+                _client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
+                _client.SendMessage(MessageType.ClearClientConsole);
                 _client.SendMessage($"{Title ?? "Main menu"}", MessageType.InformationMessege, MessegeClientInfo.Information);
-                _client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.Information);
+                _client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.Information);
 
                 for (int i = 0; i < _items.Count; i++)
                 {
@@ -115,6 +115,7 @@ namespace MyChatServer
                         break;
                     case ConsoleKey.Backspace: goto case ConsoleKey.A;
                     case ConsoleKey.LeftArrow: goto case ConsoleKey.A;
+                    case ConsoleKey.Escape: goto case ConsoleKey.A;
                 }
             }
             catch (Exception ex)

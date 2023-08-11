@@ -7,12 +7,12 @@ namespace MyChatServer
         [MenuAction("PrivateChat", 1, "Connect to private chat room")]
         public void PrivateChatSelect(ChatClient client)
         {
-            client.SendMessage(null, MessageType.ClearClientConsole);
+            client.SendMessage(MessageType.ClearClientConsole);
             var reader = new StreamReader(client.TcpClient.GetStream());
 
-            if (Program.PrivateRoomsList.Count > 0)
+            if (Server.PrivateRoomsList.Count > 0)
             {
-                _roomsAvailable = Program.PrivateRoomsList.Where(r => r.IsAvailable).ToList();
+                _roomsAvailable = Server.PrivateRoomsList.Where(r => r.IsAvailable).ToList();
 
                 if (_roomsAvailable.Count > 0)
                 {
@@ -21,14 +21,14 @@ namespace MyChatServer
                     while (!_isExit && client.TcpClient.Connected)
                     {
 
-                        client.SendMessage(null, MessageType.ClearClientConsole);
+                        client.SendMessage(MessageType.ClearClientConsole);
                         client.SendMessage("Choose wich Room you want to chat:", MessageType.PrivateChat, MessegeClientInfo.Information);
-                        client.SendMessage(null, MessageType.PrivateChat, MessegeClientInfo.Information);
+                        client.SendMessage(MessageType.PrivateChat, MessegeClientInfo.Information);
 
                         client.SendMessage($"-----( Rooms Available )-----", MessageType.PrivateChat, MessegeClientInfo.Information);
-                        client.SendMessage(null, MessageType.PrivateChat, MessegeClientInfo.Information);
+                        client.SendMessage(MessageType.PrivateChat, MessegeClientInfo.Information);
 
-                        for (int i = 0; i < Program.PrivateRoomsList.Count; i++)
+                        for (int i = 0; i < Server.PrivateRoomsList.Count; i++)
                         {
                             if (i == _index)
                             {
@@ -47,20 +47,16 @@ namespace MyChatServer
                 else
                 {
                     client.SendMessage("There is no any free Privates Room", MessageType.PrivateChat, MessegeClientInfo.Allert);
-                    client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
+                    client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
                     reader.ReadLine();
                 } 
             }
             else
             {
                 client.SendMessage("There is no existing Privates Room", MessageType.PrivateChat, MessegeClientInfo.Allert);
-                client.SendMessage(null, MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
+                client.SendMessage(MessageType.InformationMessege, MessegeClientInfo.MenuTrue);
                 reader.ReadLine();
             }
-
-            
-            //client.SendMessage(null, MessageType.PrivateChat, MessegeClientInfo.ClearClientConsole);
-
         }
 
         private int _index = 0;
@@ -108,7 +104,7 @@ namespace MyChatServer
         [MenuAction("Create Room", 2, "Here you can create new Private chat room")]
         public void PrivateRoomCreate(ChatClient client)
         {
-            client.CreatePrivateRoom();
+            Server.CreatePrivateRoom(client);
         }
     }
 }
