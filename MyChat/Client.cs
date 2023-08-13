@@ -5,23 +5,166 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace MyChat
 {
+    public class ServersSearch
+    {
+        public int Port { get; }
+        public ServersSearch(int port = 6002)
+        {
+            Port = port;
+        }
+
+        public async Task SearchAsync(List<IPEndPoint> servers, CancellationToken cancellationToken = default)
+        {
+            UdpClient udpClient = new UdpClient();
+
+            var msg = Encoding.UTF8.GetBytes("Who is Server?");
+            var endPoint = new IPEndPoint(IPAddress.Broadcast, Port);
+
+            await udpClient.SendAsync(msg, endPoint, cancellationToken);
+        
+            var recive = await udpClient.ReceiveAsync(cancellationToken);
+            
+            var reciveMessage = Encoding.UTF8.GetString(recive.Buffer);
+            int port = -1;
+            if (reciveMessage.StartsWith("I`m Server, port:"))
+            {
+                var ports = reciveMessage[(reciveMessage.IndexOf(":") + 1)..].Split(':');
+                foreach (var p in ports)
+                {
+                    port = int.Parse(p.Trim());
+                    if (!servers.Any(s => s.Port == port))
+                    {
+                        servers.Add(new IPEndPoint(recive.RemoteEndPoint.Address, port));
+                        Console.WriteLine("I Find new server");
+                    }
+                }
+            }
+
+        }
+
+    }
     internal class Client
     {
-
-        private bool isMenu = true;
-        private bool isInPublicChat = false;
+        private bool _isMenu = true;
+        private bool _isInPublicChat = false;
         private string Name = string.Empty;
 
-        public Task Start()
+        private int _index = 0;
+        private bool _isExit = false;
+        internal List<IPEndPoint> _servers = new List<IPEndPoint>();
+
+
+        public async Task Start()
+        {
+            var tasks = Task.Run(Process);
+
+            await tasks;
+        }
+
+        public void Process()
+        {
+            ServersSearch serversSearch = new ServersSearch();
+            while (!_isExit)
+            {
+                var searchingTask = Task.Run( () =>
+                {
+                     serversSearch.SearchAsync(_servers);
+                });
+                Console.Clear();
+                if (_servers.Count > 0)
+                {
+
+                    Console.WriteLine($"Servers");
+
+                    for (int i = 0; i < _servers.Count; i++)
+                    {
+                        if (i == _index)
+                        {
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            Console.WriteLine($"{_servers[i].Port} <--");
+                            Console.ResetColor();
+                        }
+                        else
+                        {
+
+                            Console.WriteLine($"{_servers[i].Port}");
+                        }
+                    }
+
+                    MoveEnter();
+                }
+                else
+                {
+                    Console.WriteLine("Sorry there is no servers, searching...");
+                    Console.WriteLine("If you want to Exit press ( Q )");
+                    var k = Console.ReadKey(true).Key;
+                    
+                    if (k == ConsoleKey.Q)
+                        _isExit = true;
+                }
+            
+            }
+            _isExit = false;
+        }
+        private void MoveEnter()
+        {
+            try
+            {
+
+                var key = Console.ReadKey(true).Key;
+
+                switch (key)
+                {
+                    case ConsoleKey.W:
+                        _index = (_index - 1 < 0) ? _servers.Count - 1 : _index - 1;
+                        break;
+                    case ConsoleKey.UpArrow: goto case ConsoleKey.W;
+
+                    case ConsoleKey.S:
+                        _index = (_index + 1 > _servers.Count - 1) ? 0 : _index + 1;
+                        break;
+                    case ConsoleKey.DownArrow: goto case ConsoleKey.S;
+
+                    case ConsoleKey.D:
+                        try
+                        {
+                            ConnectTo(_servers[_index]);
+                        }
+                        catch
+                        {
+                            _index = 0;
+                        }
+                        break;
+                    case ConsoleKey.RightArrow: goto case ConsoleKey.D;
+                    case ConsoleKey.Enter: goto case ConsoleKey.D;
+
+                    case ConsoleKey.A:
+                        _isExit = true;
+                        _index = 0;
+                        break;
+                    case ConsoleKey.Backspace: goto case ConsoleKey.A;
+                    case ConsoleKey.LeftArrow: goto case ConsoleKey.A;
+                    case ConsoleKey.Escape: goto case ConsoleKey.A;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+
+        private Task ConnectTo(IPEndPoint serverAddress)
         {
             using var tcpClient = new TcpClient(AddressFamily.InterNetwork);
-            tcpClient.Connect(IPAddress.Loopback, 5002);
+            tcpClient.Connect(serverAddress);
 
             Console.WriteLine($"Client started on [{tcpClient.Client.LocalEndPoint}]");
             Console.WriteLine($"Connected to [{tcpClient.Client.RemoteEndPoint}]");
@@ -88,7 +231,7 @@ namespace MyChat
                 {
                     try
                     {
-                        if (isMenu)
+                        if (_isMenu)
                         {
                             var line = Convert.ToInt32(Console.ReadKey().Key);
                             writer.WriteLine(line);
@@ -112,8 +255,6 @@ namespace MyChat
             Console.ReadKey();
             return Task.CompletedTask;
         }
-
-
 
         private void Information(string[] splited)
         {
@@ -141,7 +282,7 @@ namespace MyChat
 
                     case (byte)MessegeClientInfo.MenuTrue:
 
-                        isMenu = true;
+                        _isMenu = true;
 
                         if (splited.Skip(2).FirstOrDefault() != null)
                             Print(splited, 2, ConsoleColor.Yellow);
@@ -154,7 +295,7 @@ namespace MyChat
 
                     case (byte)MessegeClientInfo.MenuFalse:
 
-                        isMenu = false;
+                        _isMenu = false;
 
                         if (splited.Skip(2).FirstOrDefault() != null)
                             Print(splited, 2, ConsoleColor.Yellow);
@@ -167,7 +308,7 @@ namespace MyChat
                         break;
                     case (byte)MessegeClientInfo.PublicChatTrue:
 
-                        isInPublicChat = true;
+                        _isInPublicChat = true;
 
                         if (splited.Skip(2).FirstOrDefault() != null)
                             Print(splited, 2, ConsoleColor.Yellow);
@@ -176,7 +317,7 @@ namespace MyChat
 
                     case (byte)MessegeClientInfo.PublicChatFalse:
 
-                        isInPublicChat = false;
+                        _isInPublicChat = false;
 
                         if (splited.Skip(2).FirstOrDefault() != null)
                             Print(splited, 2, ConsoleColor.Yellow);
@@ -206,10 +347,10 @@ namespace MyChat
 
             if (Name != string.Empty)
             {
-                if (splited[1].ToString() != $"{Name}" && isInPublicChat)
+                if (splited[1].ToString() != $"{Name}" && _isInPublicChat)
                     Print(splited);
             }
-            else if (splited[1] != tcpClient.Client.LocalEndPoint.ToString() && isInPublicChat)
+            else if (splited[1] != tcpClient.Client.LocalEndPoint.ToString() && _isInPublicChat)
                 Print(splited);
         }
         private void PrivateChat(string?[] splited, TcpClient tcpClient)
